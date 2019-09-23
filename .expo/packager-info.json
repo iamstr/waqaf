@@ -1,0 +1,10 @@
+{
+  "devToolsPort": 19002,
+  "expoServerPort": 19000,
+  "packagerPort": 19001,
+  "packagerPid": 16100,
+  "expoServerNgrokUrl": "https://rn-vzh.anonymous.waqaf.exp.direct",
+  "packagerNgrokUrl": "https://packager.rn-vzh.anonymous.waqaf.exp.direct",
+  "ngrokPid": 19600,
+  "webpackServerPort": null
+}
