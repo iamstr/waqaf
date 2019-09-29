@@ -32,4 +32,6 @@ target 'waqaf' do
 
   use_unimodules!
 
+  pod 'BVLinearGradient', :path => '../node_modules/react-native-linear-gradient'
+
 end

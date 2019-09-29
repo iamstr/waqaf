@@ -1,24 +1,35 @@
-import React, { Component } from "react";
-import { StyleSheet, View } from "react-native";
-import Submit from "./components/Button";
-import LoginField from "./components/LoginField";
-
-export default class Login extends Component {
+import * as React from "react";
+import { Button, StyleSheet, TextInput, View } from "react-native";
+export default class Login extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <LoginField />
-        <View>
-          <Submit />
-        </View>
+        <TextInput placeholder="add" style={styles.input} />
+        <Button
+          title="Send"
+          style={styles.button}
+          onPress={() => this.props.navigation.navigate("Home")}
+        />
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  input: {
+    paddingBottom: 20,
+    paddingLeft: 20,
+    paddingRight: 20,
+    borderColor: "blue"
+  },
+  button: {
+    backgroundColor: "blue",
+    color: "#88FDE7"
+  },
   container: {
     flex: 1,
-    flexDirection: "column"
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F5FCFF"
   }
 });

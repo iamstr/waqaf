@@ -1,29 +1,36 @@
 import React, { Component } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
+import { createAppContainer } from "react-navigation";
+import { createStackNavigator } from "react-navigation-stack";
+import MyDrawerNavigator from "./screens/Home";
 import Login from "./screens/Login";
 
+const RootStack = createStackNavigator(
+  {
+    Home: MyDrawerNavigator,
+    Login
+  },
+  {
+    initialRouteName: "Login"
+  }
+);
+
+const MyApp = createAppContainer(RootStack);
 export default class App extends Component {
   render() {
-    return (
-      <View style={styles.container}>
-        <Login style={styles.login} />
-      </View>
-    );
+    return <MyApp style={styles.container} />;
   }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
+    justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F5FCFF",
-    flexDirection: "column",
-    paddingLeft: 15,
-    paddingRight: 15
+    //backgroundColor: "#F5FCFF"
+    backgroundColor: "black"
   },
-  login: {
-    paddingBottom: 20,
-    paddingTop: 20
+  app: {
+    backgroundColor: "#F5FCFF"
   }
 });
