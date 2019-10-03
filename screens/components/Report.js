@@ -1,5 +1,7 @@
+import { LinearGradient } from "expo-linear-gradient";
 import React, { Component } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { Icon } from "react-native-elements";
 export default class Report extends Component {
   constructor(props) {
     super(props);
@@ -10,7 +12,7 @@ export default class Report extends Component {
   render() {
     const gradient = `linear-gradient(23deg, rgba(30,10,209,1) 0%, rgba(18,166,226,1) 59%)`;
     return (
-      <View
+      <LinearGradient
         colors={["rgba(30,10,209,1) ", " rgba(18,166,226,1)"]}
         style={styles.container}
       >
@@ -24,28 +26,33 @@ export default class Report extends Component {
         </View>
 
         <View>
-          <Image source={this.props.image} style={styles.icon}></Image>
+          <Icon name="ios-person" type="ionicon" color="white" />
         </View>
-      </View>
+      </LinearGradient>
     );
   }
 }
 
+<Icon name="person" type="ionicon" color="#fffff" />;
 const styles = StyleSheet.create({
   container: {
-    // shadowColor: "#000",
-    // shadowOffset: { width: 0, height: 1 },
-    // shadowOpacity: 0.8,
-    // shadowRadius: 2,
-    // elevation: 5,
-    borderRadius: 5,
-    flex: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0.5, height: 1 },
+    shadowOpacity: 0.8,
+    shadowRadius: 3,
+    elevation: 7,
+    borderRadius: 10,
+    flex: 1,
+    paddingLeft: 10,
+    paddingRight: 10,
     flexDirection: "row",
     justifyContent: "space-between"
   },
   header: {
-    paddingTop: 5,
-    fontWeight: "bold"
+    paddingTop: 15,
+    fontWeight: "bold",
+    color: "#cfd0d1",
+    fontSize: 25
   },
   box: {
     flex: 1,
@@ -53,11 +60,14 @@ const styles = StyleSheet.create({
   },
   info: {
     paddingBottom: 10,
-    fontWeight: "bold",
-    fontSize: 10
+    fontWeight: "300",
+    fontSize: 18,
+    color: "white"
   },
   icon: {
-    width: 48,
-    height: 48
+    width: 128,
+    height: 128,
+    paddingTop: 15,
+    paddingBottom: 15
   }
 });

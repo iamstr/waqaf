@@ -1,8 +1,8 @@
 import { LinearGradient } from "expo-linear-gradient";
 import * as React from "react";
-import { StatusBar, StyleSheet, View } from "react-native";
+import { Image, StatusBar, StyleSheet, Text, View } from "react-native";
 import { Button, Input } from "react-native-elements";
-export default class Login extends React.Component {
+export default class Payment extends React.Component {
   static navigationOptions = {
     title: "Waqaf",
     headerStyle: {
@@ -11,7 +11,15 @@ export default class Login extends React.Component {
     headerTintColor: "#fff",
     headerTitleStyle: {
       fontWeight: "bold"
-    }
+    },
+
+    drawerLabel: "Make Payment",
+    drawerIcon: ({ tintColor }) => (
+      <Image
+        source={require("./icons8-money-90.png")}
+        style={[styles.icon, { tintColor: tintColor }]}
+      />
+    )
   };
   constructor(props) {
     super(props);
@@ -32,16 +40,17 @@ export default class Login extends React.Component {
 
         <View style={styles.container}>
           <View style={styles.input}>
-            <Input label="phone Number" />
+            <Text>Pay Your Water Bills</Text>
           </View>
           <View style={styles.input}>
-            <Input label="Email" />
+            <Text>Lipa na M-Pesa</Text>
+            <Text>006321</Text>
+          </View>
+          <View>
+            <Input label="M-pesa Code" />
           </View>
           <View style={styles.button}>
-            <Button
-              title="Send"
-              onPress={() => this.props.navigation.navigate("Home")}
-            />
+            <Button title="Send" />
           </View>
         </View>
       </LinearGradient>
@@ -50,6 +59,10 @@ export default class Login extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  icon: {
+    width: 24,
+    height: 24
+  },
   input: {
     paddingBottom: 20,
     paddingLeft: 20,

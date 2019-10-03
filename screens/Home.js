@@ -1,8 +1,11 @@
 import React from "react";
-import { Button, Image, StyleSheet, View } from "react-native";
+import { Image, ScrollView, StyleSheet } from "react-native";
 import { createDrawerNavigator } from "react-navigation-drawer";
 import List from "./components/List";
 import Report from "./components/Report";
+import Leakage from "./Leakage";
+import Logout from "./Logout";
+import Payment from "./Payments";
 
 class Home extends React.Component {
   constructor(props) {
@@ -18,36 +21,29 @@ class Home extends React.Component {
         source={require("./icons8-user-90.png")}
         style={[styles.icon, { tintColor: tintColor }]}
       />
-    )
+    ),
+    headerStyle: {
+      backgroundColor: "rgba(30,10,209,1)"
+    },
+    headerTintColor: "#fff",
+    headerTitleStyle: {
+      fontWeight: "bold"
+    }
   };
 
   render() {
     return (
-      <View style={{ flex: 1, flexDirection: "column" }}>
-        <Report image={require("./icons8-user-90.png")} />
+      <ScrollView>
+        <Report
+          image={require("./icons8-user-90.png")}
+          style={{
+            paddingLeft: 20,
+            paddingRight: 20,
+            height: 20
+          }}
+        />
         <List />
-      </View>
-    );
-  }
-}
-
-class MyNotificationsScreen extends React.Component {
-  static navigationOptions = {
-    drawerLabel: "Notifications",
-    drawerIcon: ({ tintColor }) => (
-      <Image
-        source={require("./icons8-commercial-90.png")}
-        style={[styles.icon, { tintColor: tintColor }]}
-      />
-    )
-  };
-
-  render() {
-    return (
-      <Button
-        onPress={() => this.props.navigation.goBack()}
-        title="Go back home"
-      />
+      </ScrollView>
     );
   }
 }
@@ -68,8 +64,14 @@ export default MyDrawerNavigator = createDrawerNavigator({
   Home: {
     screen: Home
   },
-  Notifications: {
-    screen: MyNotificationsScreen
+  Payment: {
+    screen: Payment
+  },
+  Report: {
+    screen: Leakage
+  },
+  Logout: {
+    screen: Logout
   }
 });
 

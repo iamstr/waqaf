@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { ListItem } from "react-native-elements";
 
 const list = [
@@ -34,13 +34,23 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center"
+  },
+  text: {
+    fontWeight: "bold",
+    color: "#cfd0d1",
+    fontSize: 20,
+    paddingLeft: 15
+  },
+  linear: {
+    paddingVertical: 15,
+    backgroundColor: "#02046b"
   }
 });
 
 export default class List extends Component {
   render() {
     return (
-      <View style={styles.list}>
+      <View style={{ flex: 1 }}>
         {list.map((l, i) => (
           <ListItem
             key={i}
@@ -49,6 +59,13 @@ export default class List extends Component {
             bottomDivider
           />
         ))}
+        <View>
+          <View style={styles.linear}>
+            <Text style={styles.text}> Current Charges</Text>
+          </View>
+
+          <ListItem title="Water Charges" subtitle="120" bottomDivider />
+        </View>
       </View>
     );
   }
