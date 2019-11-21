@@ -3,10 +3,18 @@ import { Image, ScrollView, StyleSheet } from "react-native";
 import { createDrawerNavigator } from "react-navigation-drawer";
 import List from "./components/List";
 import Report from "./components/Report";
+import logo from "./icons8-user-90.png";
 import Leakage from "./Leakage";
 import Logout from "./Logout";
 import Payment from "./Payments";
-
+// const MenuIcon = ({ navigate }) => (
+//   <Icon
+//     name="three-bars"
+//     size={30}
+//     color="#000"
+//     onPress={() => navigate("DrawerOpen")}
+//   />
+// );
 class Home extends React.Component {
   constructor(props) {
     super(props);
@@ -17,11 +25,9 @@ class Home extends React.Component {
   static navigationOptions = {
     drawerLabel: "Home",
     drawerIcon: ({ tintColor }) => (
-      <Image
-        source={require("./icons8-user-90.png")}
-        style={[styles.icon, { tintColor: tintColor }]}
-      />
+      <Image source={logo} style={[styles.icon, { tintColor: tintColor }]} />
     ),
+    // headerRight: () => MenuIcon(this.props.navigation),
     headerStyle: {
       backgroundColor: "rgba(30,10,209,1)"
     },
@@ -34,14 +40,7 @@ class Home extends React.Component {
   render() {
     return (
       <ScrollView>
-        <Report
-          image={require("./icons8-user-90.png")}
-          style={{
-            paddingLeft: 20,
-            paddingRight: 20,
-            height: 20
-          }}
-        />
+        <Report image={require("./icons8-user-90.png")} style={styles.report} />
         <List />
       </ScrollView>
     );
@@ -57,6 +56,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center"
+  },
+  report: {
+    paddingLeft: 20,
+    paddingRight: 20,
+    height: 20
   }
 });
 

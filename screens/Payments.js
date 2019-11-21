@@ -1,7 +1,16 @@
 import { LinearGradient } from "expo-linear-gradient";
 import * as React from "react";
-import { Image, StatusBar, StyleSheet, Text, View } from "react-native";
+import { Image, StatusBar, Text, View } from "react-native";
 import { Button, Input } from "react-native-elements";
+import Icon from "react-native-vector-icons/Octicons";
+const MenuIcon = ({ navigate }) => (
+  <Icon
+    name="three-bars"
+    size={30}
+    color="#000"
+    onPress={() => navigate("DrawerOpen")}
+  />
+);
 export default class Payment extends React.Component {
   static navigationOptions = {
     title: "Waqaf",
@@ -12,6 +21,7 @@ export default class Payment extends React.Component {
     headerTitleStyle: {
       fontWeight: "bold"
     },
+    headerRight: () => MenuIcon(this.props.navigation),
 
     drawerLabel: "Make Payment",
     drawerIcon: ({ tintColor }) => (
@@ -26,7 +36,27 @@ export default class Payment extends React.Component {
 
     this.state = {};
   }
-
+  send() {
+    fetch("http://192.168.1.170/mosque/resources/api/payment.php", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        user: this.state.code,
+        client_id: AsyncStorage.getItem("userID")
+      })
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        Alert.alert(responseJson);
+        AsyncStorage.setItem("user_id", responseJson.userID);
+      })
+      .catch(function(error) {
+        Alert.alert("There has been a problem  " + error.message);
+      });
+  }
   render() {
     return (
       <LinearGradient
@@ -47,10 +77,17 @@ export default class Payment extends React.Component {
             <Text>006321</Text>
           </View>
           <View>
-            <Input label="M-pesa Code" />
+            <Input
+              label="M-pesa Code"
+              onChangeText={code =>
+                this.setState({
+                  code
+                })
+              }
+            />
           </View>
           <View style={styles.button}>
-            <Button title="Send" />
+            <Button title="Send" onPress={() => this.send} />
           </View>
         </View>
       </LinearGradient>

@@ -1,7 +1,8 @@
 import { LinearGradient } from "expo-linear-gradient";
 import * as React from "react";
-import { StatusBar, StyleSheet, View } from "react-native";
+import { Alert, AsyncStorage, StatusBar, StyleSheet, View } from "react-native";
 import { Button, Input } from "react-native-elements";
+
 export default class Login extends React.Component {
   static navigationOptions = {
     title: "Waqaf",
@@ -16,7 +17,34 @@ export default class Login extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      user: "",
+      phone: ""
+    };
+  }
+
+  auth(phone, user) {
+    AsyncStorage.setItem("phone", phone);
+    AsyncStorage.setItem("user", user);
+
+    fetch("http://192.168.1.170/mosque/resources/api/get_client.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: JSON.stringify({
+        user: this.state.user,
+        password: this.state.phone
+      })
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        Alert.alert(responseJson);
+        AsyncStorage.setItem("user_id", responseJson.userID);
+      })
+      .catch(function(error) {
+        Alert.alert("There has been a problem  " + error.message);
+      });
   }
 
   render() {
@@ -32,15 +60,29 @@ export default class Login extends React.Component {
 
         <View style={styles.container}>
           <View style={styles.input}>
-            <Input label="phone Number" />
+            <Input
+              label="phone Number"
+              onChangeText={phone =>
+                this.setState({
+                  phone
+                })
+              }
+            />
           </View>
           <View style={styles.input}>
-            <Input label="Email" />
+            <Input
+              label="House Number"
+              onChangeText={user =>
+                this.setState({
+                  user
+                })
+              }
+            />
           </View>
           <View style={styles.button}>
             <Button
-              title="Send"
-              onPress={() => this.props.navigation.navigate("Home")}
+              title="Login"
+              onPress={() => this.auth(this.state.phone, this.state.user)}
             />
           </View>
         </View>
