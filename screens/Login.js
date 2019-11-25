@@ -1,10 +1,12 @@
 import { LinearGradient } from "expo-linear-gradient";
 import * as React from "react";
-import { Alert, AsyncStorage, StatusBar, StyleSheet, View } from "react-native";
+import { StatusBar, StyleSheet, View, AsyncStorage } from "react-native";
+
 import { Button, Input } from "react-native-elements";
+import config from "../lib/config";
 
 export default class Login extends React.Component {
-  static navigationOptions = {
+  static navigationOptions = navigation => ({
     title: "Waqaf",
     headerStyle: {
       backgroundColor: "rgba(30,10,209,1)"
@@ -13,38 +15,81 @@ export default class Login extends React.Component {
     headerTitleStyle: {
       fontWeight: "bold"
     }
-  };
+  });
   constructor(props) {
     super(props);
 
     this.state = {
       user: "",
-      phone: ""
+      phone: "",
+      name: "",
+      clients_id: ""
     };
   }
+  async _store(state) {
+    try {
+      return {
+        user_id: await AsyncStorage.setItem(
+          "clients_id",
+          JSON.stringify(state.clients_id)
+        ),
+        house: await AsyncStorage.setItem("house", JSON.stringify(state.house)),
+        name: await AsyncStorage.setItem("name", JSON.stringify(state.name)),
+        phone: await AsyncStorage.setItem("phone", JSON.stringify(state.phone))
+      };
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+  async auth(phone, user) {
+    try {
+      let phoneAsync = await AsyncStorage.setItem("phone", phone);
+      let userAsync = await AsyncStorage.setItem("user", user);
+      let formBody = [];
 
-  auth(phone, user) {
-    AsyncStorage.setItem("phone", phone);
-    AsyncStorage.setItem("user", user);
+      const dbData = new FormData();
+      dbData.append("userName", user);
+      dbData.append("phoneNumber", phone);
+      for (let property in this.state) {
+        let encodedKey = encodeURIComponent(property);
+        let encodedValue = encodeURIComponent(this.state[property]);
+        formBody.push(encodedKey + "=" + encodedValue);
+      }
+      formBody = formBody.join("&");
 
-    fetch("http://192.168.1.170/mosque/resources/api/get_client.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: JSON.stringify({
-        user: this.state.user,
-        password: this.state.phone
+      fetch(`${config.url}client`, {
+        method: "POST",
+        body: dbData
       })
-    })
-      .then(response => response.json())
-      .then(responseJson => {
-        Alert.alert(responseJson);
-        AsyncStorage.setItem("user_id", responseJson.userID);
-      })
-      .catch(function(error) {
-        Alert.alert("There has been a problem  " + error.message);
-      });
+        .then(response => response.json())
+        .then(responseJson => {
+          if (responseJson.hasOwnProperty("userID")) {
+            console.log(responseJson);
+
+            this.setState({ ...responseJson });
+            this._stored(this.setState({ ...responseJson }))
+              .then(function() {})
+              .catch(function(error) {
+                console.log(
+                  "There has been a problem with async storage  " +
+                    error.message
+                );
+              });
+            let userID = AsyncStorage.getItem("name");
+            return console.log(JSON.stringify({ ...this.state }));
+
+            this.props.navigation.navigate("Home", { ...this.state });
+            //
+          }
+
+          //
+        })
+        .catch(function(error) {
+          console.log("There has been a problem  " + error.message);
+        });
+    } catch (error) {
+      console.log(`this was the error ${error}`);
+    }
   }
 
   render() {
