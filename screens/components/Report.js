@@ -11,18 +11,44 @@ export default class Report extends Component {
 
   render() {
     const gradient = `linear-gradient(23deg, rgba(30,10,209,1) 0%, rgba(18,166,226,1) 59%)`;
+    const { info } = this.props;
+    const items = [
+      {
+        name: "Name",
+        style: "style.header",
+        value: info.name
+      },
+
+      {
+        name: "house",
+        style: "style.header",
+        value: info.house
+      },
+
+      {
+        name: "amount_due",
+        style: "style.header",
+        value: info.amount_due
+      }
+    ];
     return (
       <LinearGradient
         colors={["rgba(30,10,209,1) ", " rgba(18,166,226,1)"]}
         style={styles.container}
       >
         <View style={styles.box}>
-          <Text style={styles.header}>Name</Text>
-          <Text style={styles.info}>Ali</Text>
+          {items.map((l, i) => (
+            <View key={i}>
+              <Text style={styles.header}>{l.name}</Text>
+              <Text style={styles.info}>{info.value}</Text>
+            </View>
+          ))}
+          {/* <Text style={styles.header}>Name</Text>
+          <Text style={styles.info}>{info.name}</Text>
           <Text style={styles.header}>House No</Text>
-          <Text style={styles.info}>22224</Text>
+          <Text style={styles.info}>{info.house}</Text>
           <Text style={styles.header}>Amount due</Text>
-          <Text style={styles.info}>0</Text>
+          <Text style={styles.info}>{info.amount_due}</Text> */}
         </View>
 
         <View>
@@ -41,7 +67,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 3,
     elevation: 7,
-    borderRadius: 10,
+    borderBottomEndRadius: 10,
     flex: 1,
     paddingLeft: 10,
     paddingRight: 10,

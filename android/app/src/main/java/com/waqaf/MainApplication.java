@@ -3,6 +3,8 @@ package com.waqaf;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+
+import dog.craftz.sqlite_2.RNSqlite2Package;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -27,9 +29,7 @@ import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {
   private final ReactModuleRegistryProvider mModuleRegistryProvider = new ReactModuleRegistryProvider(
-    new BasePackageList().getPackageList(),
-    Arrays.<SingletonModule>asList()
-  );
+      new BasePackageList().getPackageList(), Arrays.<SingletonModule>asList());
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
     @Override
@@ -39,14 +39,9 @@ public class MainApplication extends Application implements ReactApplication {
 
     @Override
     protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(
-          new MainReactPackage(),
-            new LinearGradientPackage(),
-          new ReanimatedPackage(),
-          new RNGestureHandlerPackage(),
-          new RNScreensPackage(),
-          new ModuleRegistryAdapter(mModuleRegistryProvider)
-      );
+      return Arrays.<ReactPackage>asList(new MainReactPackage(), new AsyncStoragePackage(), new RNSqlite2Package(),
+          new LinearGradientPackage(), new ReanimatedPackage(), new RNGestureHandlerPackage(), new RNScreensPackage(),
+          new ModuleRegistryAdapter(mModuleRegistryProvider));
     }
 
     @Override

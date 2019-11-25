@@ -1,6 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
 import * as React from "react";
-import { Image, StatusBar, Text, View } from "react-native";
+import { Image, StatusBar, StyleSheet, Text, View } from "react-native";
 import { Button, Input } from "react-native-elements";
 import Icon from "react-native-vector-icons/Octicons";
 const MenuIcon = ({ navigate }) => (
