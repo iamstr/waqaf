@@ -36,46 +36,58 @@ class Home extends React.Component {
       previous: "",
       consumption: "",
       balance: "",
-      water_charges: ""
+      water_charges: "",
+      userID: ""
     };
-
-    this._getData();
   }
   async _getData() {
     try {
-      this.setState({
-        house: await AsyncStorage.getItem("house"),
-        name: await AsyncStorage.getItem("name"),
-        phone: await AsyncStorage.getItem("phone"),
-        clients_id: await AsyncStorage.getItem("user_id")
-      });
+      const name = await AsyncStorage.getItem("username");
+      const userID = await AsyncStorage.getItem("userID");
+      const house = await AsyncStorage.getItem("house");
+      const phone = await AsyncStorage.getItem("username");
+
+      this.setState({ name, house, userID });
+      const obj = this.state;
+      return obj;
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
     }
   }
   componentDidMount() {
-    (function() {
-      fetch(`${config.home + this.state.clients_id}`, {
-        method: "GET"
+    this._getData()
+      .then(function(obj) {
+        console.log(obj);
       })
-        .then(response => response.json())
-        .then(responseJson => {
-          console.log(responseJson);
-          this.setState({
-            balance: responseJson.balance,
-            amount_due: responseJson.amount_due,
-            water_charges: responseJson.water_charges,
-            previous: responseJson.previous,
-            current: responseJson.current,
-            consumption: responseJson.consumption
-          });
-          return Alert.alert(JSON.stringify(responseJson));
-        })
-        .catch(function(error) {
-          Alert.alert("There has been a problem  " + error.message);
-          console.log(error.message);
-        });
-    })();
+      .catch(error => {
+        console.log(
+          " we could not understand what you were impplying" + error.message
+        );
+      });
+
+    // fetch(
+    //   ` http://192.168.1.204/mosque/resources/api/get_info.php?user=${obj.userID}`,
+    //   {
+    //     method: "GET"
+    //   }
+    // )
+    //   .then(response => response.json())
+    //   .then(responseJson => {
+    //     console.log(responseJson);
+    //     this.setState({
+    //       balance: responseJson.balance,
+    //       amount_due: responseJson.amount_due,
+    //       water_charges: responseJson.water_charges,
+    //       previous: responseJson.previous,
+    //       current: responseJson.current,
+    //       consumption: responseJson.consumption
+    //     });
+    //     return Alert.alert(JSON.stringify(responseJson));
+    //   })
+    //   .catch(function(error) {
+    //     Alert.alert("There has been a problem  " + error.message);
+    //     console.log(error.message);
+    //   });
   }
 
   static navigationOptions = ({ navigation }) => ({
@@ -94,6 +106,16 @@ class Home extends React.Component {
   });
 
   render() {
+    const { navigation } = this.props;
+    const obj = {
+      house: JSON.stringify(navigation.getParam("house", "house")),
+      username: JSON.stringify(navigation.getParam("username", "user")),
+      phone: JSON.stringify(navigation.getParam("phone", "phone")),
+      userID: JSON.stringify(navigation.getParam("userID", "userID"))
+    };
+
+    navigation.getParam("UserID", "NO-ID");
+    console.log(JSON.stringify(navigation.getParam("house", " of testing")));
     return (
       <ScrollView>
         <Report

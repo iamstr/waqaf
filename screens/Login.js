@@ -4,7 +4,8 @@ import { StatusBar, StyleSheet, View, AsyncStorage } from "react-native";
 
 import { Button, Input } from "react-native-elements";
 import config from "../lib/config";
-
+import { SQLite } from "expo-sqlite";
+const db = SQLite.openDatabase("db.db");
 export default class Login extends React.Component {
   static navigationOptions = navigation => ({
     title: "Waqaf",
@@ -20,27 +21,46 @@ export default class Login extends React.Component {
     super(props);
 
     this.state = {
-      user: "",
+      username: "",
       phone: "",
-      name: "",
-      clients_id: ""
+      house: "",
+      userID: "",
+      user: ""
     };
   }
-  async _store(state) {
+
+  componentDidMount = () => {
+    db.transaction(tx => {
+      tx.executeSql(
+        "create table if not exists items (id integer primary key not null, userID int not null, house VARCHAR(30),username VARCHAR(50) NOT NULL);"
+      );
+    });
+  };
+
+  _store = async state => {
     try {
-      return {
-        user_id: await AsyncStorage.setItem(
-          "clients_id",
-          JSON.stringify(state.clients_id)
-        ),
-        house: await AsyncStorage.setItem("house", JSON.stringify(state.house)),
-        name: await AsyncStorage.setItem("name", JSON.stringify(state.name)),
-        phone: await AsyncStorage.setItem("phone", JSON.stringify(state.phone))
-      };
+      const userID = await AsyncStorage.setItem(
+        "userID",
+        JSON.stringify(state.userID)
+      );
+      const house = await AsyncStorage.setItem(
+        "house",
+        JSON.stringify(state.house)
+      );
+      const username = await AsyncStorage.setItem(
+        "username",
+        JSON.stringify(state.username)
+      );
+      const phone = await AsyncStorage.setItem(
+        "phone",
+        JSON.stringify(state.phone)
+      );
+
+      return this.props.navigation.navigate("Home", { ...state });
     } catch (error) {
       console.log(error.message);
     }
-  }
+  };
   async auth(phone, user) {
     try {
       let phoneAsync = await AsyncStorage.setItem("phone", phone);
@@ -57,29 +77,19 @@ export default class Login extends React.Component {
       }
       formBody = formBody.join("&");
 
-      fetch(`${config.url}client`, {
+      fetch("http://192.168.1.204/mosque/resources/api/get_client.php", {
         method: "POST",
         body: dbData
       })
         .then(response => response.json())
         .then(responseJson => {
           if (responseJson.hasOwnProperty("userID")) {
-            console.log(responseJson);
-
             this.setState({ ...responseJson });
-            this._stored(this.setState({ ...responseJson }))
-              .then(function() {})
-              .catch(function(error) {
-                console.log(
-                  "There has been a problem with async storage  " +
-                    error.message
-                );
-              });
-            let userID = AsyncStorage.getItem("name");
-            return console.log(JSON.stringify({ ...this.state }));
+            console.log(this.state);
 
-            this.props.navigation.navigate("Home", { ...this.state });
-            //
+            //this._store(this.setState({ ...responseJson }));
+
+            this._store({ ...this.state });
           }
 
           //
