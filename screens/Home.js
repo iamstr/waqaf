@@ -7,6 +7,11 @@ import {
   AsyncStorage
 } from "react-native";
 import { createDrawerNavigator } from "react-navigation-drawer";
+<<<<<<< HEAD
+=======
+import * as SQLite from "expo-sqlite";
+
+>>>>>>> master-sqlite
 import config from "../lib/config";
 import List from "./components/List";
 import Report from "./components/Report";
@@ -14,7 +19,11 @@ import logo from "./icons8-user-90.png";
 import Leakage from "./Leakage";
 import Logout from "./Logout";
 import Payment from "./Payments";
+<<<<<<< HEAD
 
+=======
+const db = SQLite.openDatabase("test.db");
+>>>>>>> master-sqlite
 // const MenuIcon = ({ navigate }) => (
 //   <Icon
 //     name="three-bars"
@@ -36,6 +45,7 @@ class Home extends React.Component {
       previous: "",
       consumption: "",
       balance: "",
+<<<<<<< HEAD
       water_charges: ""
     };
 
@@ -76,6 +86,81 @@ class Home extends React.Component {
           console.log(error.message);
         });
     })();
+=======
+      water_charges: "",
+      userID: ""
+    };
+  }
+  async _getData() {
+    try {
+      db.transaction(tx => {
+        tx.executeSql("select * from items", [], (_, { rows }) => {
+          let obj;
+          obj = rows._array[0];
+          this.setState({ ...obj });
+
+          return obj;
+        });
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+  componentDidMount() {
+    this._getData()
+      .then(function(obj) {
+        db.transaction(tx => {});
+      })
+      .catch(error => {
+        console.log(
+          " we could not understand what you were impplying" + error.message
+        );
+      });
+
+    //
+  }
+
+  fetch = async id => {};
+  componentDidUpdate() {
+    fetch(
+      "http://192.168.1.204/mosque/resources/api/get_info.php?user=" +
+        this.state.userID,
+      {
+        method: "GET"
+      }
+    )
+      .then(response => response.json())
+      .then(responseJson => {
+        db.transaction(tx => {
+          let obj = { ...responseJson };
+
+          tx.executeSql(
+            "insert into readings( current, previous, consumption, balance, water_charges, client_house, clients_id, date, month, amount_due) values (?, ?,?,?,?,?,?,?,?,?)",
+            [
+              obj.current,
+              obj.previous,
+              obj.consumption,
+              obj.balance,
+              obj.water_charges,
+              this.state.house,
+              this.state.userID,
+              obj.date,
+              obj.month,
+              obj.amount_due
+            ],
+            (_, { rows }) => {},
+            (t, error) => {
+              console.log(error);
+            }
+          );
+        });
+      })
+      .catch(function(error) {
+        console.log(error.message);
+      });
+
+    //return this.state;
+>>>>>>> master-sqlite
   }
 
   static navigationOptions = ({ navigation }) => ({
@@ -94,6 +179,8 @@ class Home extends React.Component {
   });
 
   render() {
+    navigation.getParam("UserID", "NO-ID");
+    console.log(JSON.stringify(navigation.getParam("house", " of testing")));
     return (
       <ScrollView>
         <Report

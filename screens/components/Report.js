@@ -2,33 +2,79 @@ import { LinearGradient } from "expo-linear-gradient";
 import React, { Component } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Icon } from "react-native-elements";
+import * as SQLite from "expo-sqlite";
+const db = SQLite.openDatabase("test.db");
 export default class Report extends Component {
   constructor(props) {
     super(props);
 
     this.state = {};
   }
+  _getData = async () => {
+    db.transaction(tx => {
+      tx.executeSql("select * from items", [], (_, { rows }) => {
+        let obj;
+        obj = rows._array[0];
+        this.setState({ ...obj });
+
+        return obj;
+      });
+    });
+  };
+  componentDidMount() {
+    this._getData().then(obj => {
+      db.transaction(tx => {
+        tx.executeSql("select * from readings", [], (_, { rows }) => {
+          let obj;
+          obj = rows._array[0];
+          this.setState({ ...obj });
+          console.log(
+            "this is the object from the report ",
+
+            JSON.stringify(rows)
+          );
+          return obj;
+        });
+      });
+    });
+  }
 
   render() {
     const gradient = `linear-gradient(23deg, rgba(30,10,209,1) 0%, rgba(18,166,226,1) 59%)`;
+<<<<<<< HEAD
     const { info } = this.props;
+=======
+
+>>>>>>> master-sqlite
     const items = [
       {
         name: "Name",
         style: "style.header",
+<<<<<<< HEAD
         value: info.name
+=======
+        value: this.state.username
+>>>>>>> master-sqlite
       },
 
       {
         name: "house",
         style: "style.header",
+<<<<<<< HEAD
         value: info.house
+=======
+        value: this.state.house
+>>>>>>> master-sqlite
       },
 
       {
         name: "amount_due",
         style: "style.header",
+<<<<<<< HEAD
         value: info.amount_due
+=======
+        value: this.state.amount_due
+>>>>>>> master-sqlite
       }
     ];
     return (
@@ -40,6 +86,7 @@ export default class Report extends Component {
           {items.map((l, i) => (
             <View key={i}>
               <Text style={styles.header}>{l.name}</Text>
+<<<<<<< HEAD
               <Text style={styles.info}>{info.value}</Text>
             </View>
           ))}
@@ -53,6 +100,11 @@ export default class Report extends Component {
 
         <View>
           <Icon name="ios-person" type="ionicon" color="white" />
+=======
+              <Text style={styles.info}>{l.value}</Text>
+            </View>
+          ))}
+>>>>>>> master-sqlite
         </View>
       </LinearGradient>
     );
