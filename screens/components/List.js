@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { ListItem } from "react-native-elements";
-
+import * as SQLite from "expo-sqlite";
+const db = SQLite.openDatabase("test.db");
 const styles = StyleSheet.create({
   list: {
     flex: 1,
@@ -23,33 +24,53 @@ const styles = StyleSheet.create({
 export default class List extends Component {
   constructor(props) {
     super(props);
+    this.state = {};
+  }
+  _getData = async () => {
+    db.transaction(tx => {
+      tx.executeSql("select * from readings", [], (_, { rows }) => {
+        let obj;
+        obj = rows._array[0];
+        this.setState({ ...obj });
+        console.log(
+          "this is the object from the report ",
+
+          JSON.stringify(rows)
+        );
+        return obj;
+      });
+    });
+  };
+  componentDidMount() {
+    this._getData().then(obj => {
+      console.log(obj, "=>this is the state");
+    });
   }
   render() {
-    const { info } = this.props;
     const list = [
       {
         name: "Current Reading",
         avatar_url:
           "https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg",
-        subtitle: info.current || 0
+        subtitle: this.state.current
       },
       {
         name: "Previous Reading",
         avatar_url:
           "https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg",
-        subtitle: info.previous || 0
+        subtitle: this.state.previous
       },
       {
         name: "Consumption",
         avatar_url:
           "https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg",
-        subtitle: info.consumption || 0
+        subtitle: this.state.consumption
       },
       {
         name: "Balance Brought Forward",
         avatar_url:
           "https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg",
-        subtitle: info.balance || 0
+        subtitle: this.state.balance
       }
     ];
     return (
@@ -58,7 +79,7 @@ export default class List extends Component {
           <ListItem
             key={i}
             title={l.name}
-            subtitle={this.props.info.subtitle}
+            subtitle={l.subtitle}
             bottomDivider
           />
         ))}
@@ -69,7 +90,7 @@ export default class List extends Component {
 
           <ListItem
             title="Water Charges"
-            subtitle={this.props.info.water_charges}
+            subtitle={this.state.water_charges}
             bottomDivider
           />
         </View>

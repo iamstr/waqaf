@@ -7,6 +7,8 @@ import {
   AsyncStorage
 } from "react-native";
 import { createDrawerNavigator } from "react-navigation-drawer";
+import * as SQLite from "expo-sqlite";
+
 import config from "../lib/config";
 import List from "./components/List";
 import Report from "./components/Report";
@@ -14,7 +16,7 @@ import logo from "./icons8-user-90.png";
 import Leakage from "./Leakage";
 import Logout from "./Logout";
 import Payment from "./Payments";
-
+const db = SQLite.openDatabase("test.db");
 // const MenuIcon = ({ navigate }) => (
 //   <Icon
 //     name="three-bars"
@@ -42,14 +44,15 @@ class Home extends React.Component {
   }
   async _getData() {
     try {
-      const name = await AsyncStorage.getItem("username");
-      const userID = await AsyncStorage.getItem("userID");
-      const house = await AsyncStorage.getItem("house");
-      const phone = await AsyncStorage.getItem("username");
+      db.transaction(tx => {
+        tx.executeSql("select * from items", [], (_, { rows }) => {
+          let obj;
+          obj = rows._array[0];
+          this.setState({ ...obj });
 
-      this.setState({ name, house, userID });
-      const obj = this.state;
-      return obj;
+          return obj;
+        });
+      });
     } catch (error) {
       console.log(error.message);
     }
@@ -57,7 +60,7 @@ class Home extends React.Component {
   componentDidMount() {
     this._getData()
       .then(function(obj) {
-        console.log(obj);
+        db.transaction(tx => {});
       })
       .catch(error => {
         console.log(
@@ -65,29 +68,49 @@ class Home extends React.Component {
         );
       });
 
-    // fetch(
-    //   ` http://192.168.1.204/mosque/resources/api/get_info.php?user=${obj.userID}`,
-    //   {
-    //     method: "GET"
-    //   }
-    // )
-    //   .then(response => response.json())
-    //   .then(responseJson => {
-    //     console.log(responseJson);
-    //     this.setState({
-    //       balance: responseJson.balance,
-    //       amount_due: responseJson.amount_due,
-    //       water_charges: responseJson.water_charges,
-    //       previous: responseJson.previous,
-    //       current: responseJson.current,
-    //       consumption: responseJson.consumption
-    //     });
-    //     return Alert.alert(JSON.stringify(responseJson));
-    //   })
-    //   .catch(function(error) {
-    //     Alert.alert("There has been a problem  " + error.message);
-    //     console.log(error.message);
-    //   });
+    //
+  }
+
+  fetch = async id => {};
+  componentDidUpdate() {
+    fetch(
+      "http://192.168.1.204/mosque/resources/api/get_info.php?user=" +
+        this.state.userID,
+      {
+        method: "GET"
+      }
+    )
+      .then(response => response.json())
+      .then(responseJson => {
+        db.transaction(tx => {
+          let obj = { ...responseJson };
+
+          tx.executeSql(
+            "insert into readings( current, previous, consumption, balance, water_charges, client_house, clients_id, date, month, amount_due) values (?, ?,?,?,?,?,?,?,?,?)",
+            [
+              obj.current,
+              obj.previous,
+              obj.consumption,
+              obj.balance,
+              obj.water_charges,
+              this.state.house,
+              this.state.userID,
+              obj.date,
+              obj.month,
+              obj.amount_due
+            ],
+            (_, { rows }) => {},
+            (t, error) => {
+              console.log(error);
+            }
+          );
+        });
+      })
+      .catch(function(error) {
+        console.log(error.message);
+      });
+
+    //return this.state;
   }
 
   static navigationOptions = ({ navigation }) => ({
@@ -106,24 +129,12 @@ class Home extends React.Component {
   });
 
   render() {
-    const { navigation } = this.props;
-    const obj = {
-      house: JSON.stringify(navigation.getParam("house", "house")),
-      username: JSON.stringify(navigation.getParam("username", "user")),
-      phone: JSON.stringify(navigation.getParam("phone", "phone")),
-      userID: JSON.stringify(navigation.getParam("userID", "userID"))
-    };
-
     navigation.getParam("UserID", "NO-ID");
     console.log(JSON.stringify(navigation.getParam("house", " of testing")));
     return (
       <ScrollView>
-        <Report
-          image={require("./icons8-user-90.png")}
-          style={styles.report}
-          info={this.state}
-        />
-        <List info={this.state} />
+        <Report image={require("./icons8-user-90.png")} style={styles.report} />
+        <List />
       </ScrollView>
     );
   }

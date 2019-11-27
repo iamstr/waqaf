@@ -4,8 +4,8 @@ import { StatusBar, StyleSheet, View, AsyncStorage } from "react-native";
 
 import { Button, Input } from "react-native-elements";
 import config from "../lib/config";
-import { SQLite } from "expo-sqlite";
-const db = SQLite.openDatabase("db.db");
+import * as SQLite from "expo-sqlite";
+const db = SQLite.openDatabase("test.db");
 export default class Login extends React.Component {
   static navigationOptions = navigation => ({
     title: "Waqaf",
@@ -28,33 +28,40 @@ export default class Login extends React.Component {
       user: ""
     };
   }
-
+  componentWillUnmount() {
+    this.state = {};
+  }
   componentDidMount = () => {
     db.transaction(tx => {
+      tx.executeSql("DROP TABLE IF EXISTS items", []);
+
+      tx.executeSql("DROP TABLE IF EXISTS readings", []);
+
       tx.executeSql(
-        "create table if not exists items (id integer primary key not null, userID int not null, house VARCHAR(30),username VARCHAR(50) NOT NULL);"
+        "create table if not exists items (id integer primary key not null, userID int not null, house VARCHAR(30) NOT NULL,username VARCHAR(50) NOT NULL);"
+      );
+
+      tx.executeSql(
+        "CREATE TABLE  if not exists readings ( reading_id int(11) NOT NULL AUTO_INCREMENT, current varchar(10) NOT NULL, previous varchar(10) NOT NULL, consumption varchar(10) NOT NULL, balance varchar(10) NOT NULL, water_charges varchar(10) NOT NULL DEFAULT '120', client_house int(11) NOT NULL, clients_id int(11) NOT NULL, date date NOT NULL, month varchar(20) NOT NULL, timestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, amount_due varchar(10) NOT NULL, PRIMARY KEY (`reading_id`));",
+        (_, { rows }) => {
+          console.log(rows._array);
+        },
+        (t, error) => {
+          console.log(error);
+        }
       );
     });
   };
 
   _store = async state => {
     try {
-      const userID = await AsyncStorage.setItem(
-        "userID",
-        JSON.stringify(state.userID)
-      );
-      const house = await AsyncStorage.setItem(
-        "house",
-        JSON.stringify(state.house)
-      );
-      const username = await AsyncStorage.setItem(
-        "username",
-        JSON.stringify(state.username)
-      );
-      const phone = await AsyncStorage.setItem(
-        "phone",
-        JSON.stringify(state.phone)
-      );
+      db.transaction(tx => {
+        tx.executeSql("DROP TABLE IF items ");
+        tx.executeSql(
+          "insert into items (house, userID,username) values (?, ?,?)",
+          [state.house, state.userID, state.username]
+        );
+      });
 
       return this.props.navigation.navigate("Home", { ...state });
     } catch (error) {
