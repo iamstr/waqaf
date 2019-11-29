@@ -67,10 +67,13 @@ export default class Payment extends React.Component {
         this.setState({ userID: String(value) });
       });
 
-      fetch("http://192.168.1.204/mosque/resources/api/payment.php", {
-        method: "POST",
-        body: dbData
-      })
+      fetch(
+        "http://http://sheikhabdullahi.co.ke/mosque/resources/api/payment.php",
+        {
+          method: "POST",
+          body: dbData
+        }
+      )
         .then(response => response.json())
         .then(responseJson => {
           console.log(responseJson);

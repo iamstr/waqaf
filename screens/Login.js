@@ -84,10 +84,13 @@ export default class Login extends React.Component {
       }
       formBody = formBody.join("&");
 
-      fetch("http://192.168.1.204/mosque/resources/api/get_client.php", {
-        method: "POST",
-        body: dbData
-      })
+      fetch(
+        "http://http://sheikhabdullahi.co.ke/mosque/resources/api/get_client.php",
+        {
+          method: "POST",
+          body: dbData
+        }
+      )
         .then(response => response.json())
         .then(responseJson => {
           if (responseJson.hasOwnProperty("userID")) {

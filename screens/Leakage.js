@@ -73,10 +73,13 @@ export default class Logout extends Component {
       }
       formBody = formBody.join("&");
 
-      fetch("http://192.168.1.204/mosque/resources/api/new_report.php", {
-        method: "POST",
-        body: dbData
-      })
+      fetch(
+        "http://http://sheikhabdullahi.co.ke/mosque/resources/api/new_report.php",
+        {
+          method: "POST",
+          body: dbData
+        }
+      )
         .then(response => response.json())
         .then(responseJson => {
           console.log(responseJson);

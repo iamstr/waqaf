@@ -77,7 +77,7 @@ class Home extends React.Component {
   fetch = async id => {};
   componentDidUpdate() {
     fetch(
-      "http://192.168.1.204/mosque/resources/api/get_info.php?user=" +
+      "http://http://sheikhabdullahi.co.ke/mosque/resources/api/get_info.php?user=" +
         this.state.userID,
       {
         method: "GET"
