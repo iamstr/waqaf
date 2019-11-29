@@ -49,7 +49,10 @@ class Home extends React.Component {
           let obj;
           obj = rows._array[0];
           this.setState({ ...obj });
-
+          AsyncStorage.setItem(
+            "user",
+            String(JSON.stringify(this.state.userID))
+          );
           return obj;
         });
       });
@@ -85,6 +88,7 @@ class Home extends React.Component {
         db.transaction(tx => {
           let obj = { ...responseJson };
 
+          tx.executeSql("delete from readings");
           tx.executeSql(
             "insert into readings( current, previous, consumption, balance, water_charges, client_house, clients_id, date, month, amount_due) values (?, ?,?,?,?,?,?,?,?,?)",
             [
@@ -129,8 +133,6 @@ class Home extends React.Component {
   });
 
   render() {
-    navigation.getParam("UserID", "NO-ID");
-    console.log(JSON.stringify(navigation.getParam("house", " of testing")));
     return (
       <ScrollView>
         <Report image={require("./icons8-user-90.png")} style={styles.report} />

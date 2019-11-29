@@ -1,8 +1,9 @@
 import { LinearGradient } from "expo-linear-gradient";
 import React, { Component } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View, AsyncStorage } from "react-native";
 import { Button } from "react-native-elements";
-
+import * as SQLite from "expo-sqlite";
+const db = SQLite.openDatabase("test.db");
 export default class Logout extends Component {
   static navigationOptions = {
     drawerLabel: "Report Leakage",
@@ -26,6 +27,67 @@ export default class Logout extends Component {
     this.state = {};
   }
 
+  _client = async () => {
+    db.transaction(tx => {
+      tx.executeSql("select * from items", [], (_, { rows }) => {
+        let obj;
+        obj = rows._array[0];
+        this.setState({ ...obj });
+        console.log("object from teh leakage screen", rows);
+        return obj;
+      });
+    });
+  };
+
+  _getData = async () => {
+    db.transaction(tx => {
+      tx.executeSql("select * from items", [], (_, { rows }) => {
+        let obj;
+        obj = rows._array[0];
+        this.setState({ ...obj });
+
+        AsyncStorage.getItem("user").then(value => {
+          console.log("this is the value from async storage", String(value));
+
+          this.setState({ userID: String(value) });
+        });
+
+        return obj;
+      });
+    });
+  };
+  componentDidMount() {
+    this._getData();
+  }
+  _report = async () => {
+    this._getData().then(obj => {
+      let formBody = [];
+      console.log(this.state);
+      const dbData = new FormData();
+      dbData.append("userName", this.state.userID);
+
+      for (let property in this.state) {
+        let encodedKey = encodeURIComponent(property);
+        let encodedValue = encodeURIComponent(this.state[property]);
+        formBody.push(encodedKey + "=" + encodedValue);
+      }
+      formBody = formBody.join("&");
+
+      fetch("http://192.168.1.204/mosque/resources/api/new_report.php", {
+        method: "POST",
+        body: dbData
+      })
+        .then(response => response.json())
+        .then(responseJson => {
+          console.log(responseJson);
+          //
+        })
+        .catch(function(error) {
+          console.log("There has been a problem  " + error.message);
+        });
+    });
+  };
+
   render() {
     return (
       <LinearGradient
@@ -46,7 +108,9 @@ export default class Logout extends Component {
             style={styles.yes}
             backgroundColor="white"
             color="#fff"
-            onPress={() => this.props.navigation.navigate("Leakage")}
+            onPress={() => {
+              this._report();
+            }}
           />
         </View>
       </LinearGradient>

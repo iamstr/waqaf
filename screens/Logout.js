@@ -2,7 +2,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import React, { Component } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { Button } from "react-native-elements";
-
+import * as SQLite from "expo-sqlite";
+const db = SQLite.openDatabase("test.db");
 export default class Logout extends Component {
   static navigationOptions = {
     drawerLabel: "Logout",
@@ -24,6 +25,18 @@ export default class Logout extends Component {
     super(props);
 
     this.state = {};
+  }
+  _delete = async () => {
+    db.transaction(tx => {
+      tx.executeSql("delete from items");
+      tx.executeSql("delete from readings");
+    });
+  };
+
+  componentDidMount() {
+    this._delete().then(() => {
+      this.props.navigation.navigate("Login");
+    });
   }
 
   render() {

@@ -11,30 +11,43 @@ export default class Report extends Component {
     this.state = {};
   }
   _getData = async () => {
-    db.transaction(tx => {
-      tx.executeSql("select * from items", [], (_, { rows }) => {
-        let obj;
-        obj = rows._array[0];
-        this.setState({ ...obj });
+    try {
+      db.transaction(tx => {
+        tx.executeSql("select * from items", [], (_, { rows }) => {
+          let obj;
+          obj = rows._array[0];
+          this.setState({ ...obj });
 
-        return obj;
+          console.log("this is the user object from the report", obj);
+          return obj;
+        });
       });
-    });
+    } catch (error) {
+      console.log(error.message);
+    }
   };
   componentDidMount() {
     this._getData().then(obj => {
       db.transaction(tx => {
-        tx.executeSql("select * from readings", [], (_, { rows }) => {
-          let obj;
-          obj = rows._array[0];
-          this.setState({ ...obj });
-          console.log(
-            "this is the object from the report ",
+        tx.executeSql(
+          "select * from readings where clients_id=?",
+          [this.state.userID],
+          (_, { rows }) => {
+            let obj,
+              length = rows.length - 1;
+            obj = rows._array[+length];
+            this.setState({ ...obj });
+            console.log(
+              "this is the object from the report ",
 
-            JSON.stringify(rows)
-          );
-          return obj;
-        });
+              JSON.stringify(rows)
+            );
+            return obj;
+          },
+          (t, error) => {
+            console.log(error);
+          }
+        );
       });
     });
   }

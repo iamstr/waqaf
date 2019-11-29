@@ -1,16 +1,17 @@
 import { LinearGradient } from "expo-linear-gradient";
 import * as React from "react";
-import { Image, StatusBar, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+  AsyncStorage,
+  Alert
+} from "react-native";
 import { Button, Input } from "react-native-elements";
 import Icon from "react-native-vector-icons/Octicons";
-const MenuIcon = ({ navigate }) => (
-  <Icon
-    name="three-bars"
-    size={30}
-    color="#000"
-    onPress={() => navigate("DrawerOpen")}
-  />
-);
+
 export default class Payment extends React.Component {
   static navigationOptions = {
     title: "Waqaf",
@@ -21,7 +22,6 @@ export default class Payment extends React.Component {
     headerTitleStyle: {
       fontWeight: "bold"
     },
-    headerRight: () => MenuIcon(this.props.navigation),
 
     drawerLabel: "Make Payment",
     drawerIcon: ({ tintColor }) => (
@@ -34,29 +34,65 @@ export default class Payment extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      code: "",
+      userID: "",
+      amount: ""
+    };
   }
-  send() {
-    fetch("http://192.168.1.170/mosque/resources/api/payment.php", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        user: this.state.code,
-        client_id: AsyncStorage.getItem("userID")
-      })
-    })
-      .then(response => response.json())
-      .then(responseJson => {
-        Alert.alert(responseJson);
-        AsyncStorage.setItem("user_id", responseJson.userID);
-      })
-      .catch(function(error) {
-        Alert.alert("There has been a problem  " + error.message);
+  _send = async () => {
+    try {
+      AsyncStorage.getItem("user").then(value => {
+        console.log("this is the value from async storage", String(value));
+
+        this.setState({ userID: String(value) });
       });
-  }
+      console.log("this is the state", this.state);
+      let formBody = [];
+
+      const dbData = new FormData();
+      dbData.append("userID", this.state.userID);
+      dbData.append("code", this.state.code);
+      dbData.append("amount", this.state.amount);
+      for (let property in this.state) {
+        let encodedKey = encodeURIComponent(property);
+        let encodedValue = encodeURIComponent(this.state[property]);
+        formBody.push(encodedKey + "=" + encodedValue);
+      }
+      formBody = formBody.join("&");
+
+      AsyncStorage.getItem("user").then(value => {
+        console.log("this is the value from async storage", String(value));
+
+        this.setState({ userID: String(value) });
+      });
+
+      fetch("http://192.168.1.204/mosque/resources/api/payment.php", {
+        method: "POST",
+        body: dbData
+      })
+        .then(response => response.json())
+        .then(responseJson => {
+          console.log(responseJson);
+          if (
+            responseJson.hasOwnProperty("status") &&
+            responseJson.status === "warning"
+          ) {
+            return Alert.alert("you used this code before please check again");
+            //this._store(this.setState({ ...responseJson }));
+          } else {
+            return Alert.alert("success");
+          }
+
+          //
+        })
+        .catch(function(error) {
+          console.log("There has been a problem  " + error.message);
+        });
+    } catch (error) {
+      console.log(`this was the error ${error}`);
+    }
+  };
   render() {
     return (
       <LinearGradient
@@ -70,11 +106,11 @@ export default class Payment extends React.Component {
 
         <View style={styles.container}>
           <View style={styles.input}>
-            <Text>Pay Your Water Bills</Text>
+            <Text style={styles.info}>Pay Your Water Bills</Text>
           </View>
           <View style={styles.input}>
             <Text>Lipa na M-Pesa</Text>
-            <Text>006321</Text>
+            <Text style={styles.info}>006321</Text>
           </View>
           <View>
             <Input
@@ -86,8 +122,23 @@ export default class Payment extends React.Component {
               }
             />
           </View>
+          <View>
+            <Input
+              label="Amount"
+              onChangeText={amount =>
+                this.setState({
+                  amount
+                })
+              }
+            />
+          </View>
           <View style={styles.button}>
-            <Button title="Send" onPress={() => this.send} />
+            <Button
+              title="Send"
+              onPress={() => {
+                this._send();
+              }}
+            />
           </View>
         </View>
       </LinearGradient>
@@ -125,5 +176,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center"
-  }
+  },
+  info: { color: "white" }
 });
